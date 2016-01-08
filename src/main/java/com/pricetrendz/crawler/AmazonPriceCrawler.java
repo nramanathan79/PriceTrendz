@@ -1,7 +1,6 @@
 package com.pricetrendz.crawler;
 
 import com.pricetrendz.bean.Product;
-import com.sun.istack.internal.Nullable;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -89,7 +88,6 @@ public class AmazonPriceCrawler extends PriceCrawler {
                 (searchFilters != null ? searchFilters.stream().collect(joining("+")) : "");
     }
 
-    @Nullable
     private String getNextPageUrl() {
         // Get the next page link element
         final Element nextPage = (getHtmlDocument() != null ? getHtmlDocument().getElementById("pagnNextLink") : null);
