@@ -5,6 +5,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
 
 abstract public class PriceCrawler {
@@ -14,7 +15,7 @@ abstract public class PriceCrawler {
     private final String userAgent;
     private final int timeout;
     private final String domainUrl;
-    private Document htmlDocument;
+    private Optional<Document> htmlDocument;
 
     protected PriceCrawler(final String userAgent, final int timeout, final String domainUrl) {
         this.userAgent = userAgent;
@@ -38,20 +39,17 @@ abstract public class PriceCrawler {
         return domainUrl;
     }
 
-    protected Document getHtmlDocument() {
+    protected Optional<Document> getHtmlDocument() {
         return htmlDocument;
     }
 
-    protected Document getHtmlDocument(final String url) {
-        if (fullyQualifiedUrl(url) != null) {
-            try {
-                htmlDocument = Jsoup.connect(fullyQualifiedUrl(url)).userAgent(userAgent).timeout(timeout).followRedirects(true).get();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-                htmlDocument = null;
-            }
-        } else {
-            htmlDocument = null;
+    protected Optional<Document> getHtmlDocument(final String url) {
+        try {
+            htmlDocument = Optional.ofNullable(Jsoup.connect(fullyQualifiedUrl(url)).userAgent(userAgent).timeout(timeout).followRedirects(true).get());
+        }
+        catch (IOException ioe) {
+            ioe.printStackTrace();
+            htmlDocument = Optional.empty();
         }
 
         return htmlDocument;

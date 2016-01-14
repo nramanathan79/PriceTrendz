@@ -25,7 +25,8 @@ abstract public class BaseBean implements Comparable<BaseBean> {
 
         try {
             json = jsonMapper.writeValueAsString(this);
-        } catch (JsonProcessingException jpe) {
+        }
+        catch (JsonProcessingException jpe) {
             jpe.printStackTrace();
         }
 

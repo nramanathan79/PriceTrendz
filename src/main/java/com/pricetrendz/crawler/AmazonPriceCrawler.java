@@ -4,6 +4,7 @@ import com.pricetrendz.bean.Product;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Arrays.stream;
@@ -88,15 +89,15 @@ public class AmazonPriceCrawler extends PriceCrawler {
                 (searchFilters != null ? searchFilters.stream().collect(joining("+")) : "");
     }
 
-    private String getNextPageUrl() {
-        // Get the next page link element
-        final Element nextPage = (getHtmlDocument() != null ? getHtmlDocument().getElementById("pagnNextLink") : null);
-
+    private Optional<String> getNextPageUrl() {
         // Get the URL from the next page link, if exists
-        String url = (nextPage != null && nextPage.hasAttr("href") ? nextPage.attr("href") : null);
-
-        // String unwanted suffix in the url and return
-        return (url != null ? url.substring(0, url.indexOf("&ie=")) : null);
+        return Optional.ofNullable(
+                getHtmlDocument()
+                        .map(d -> d.getElementById("pagnNextLink"))
+                        .filter(e -> e.hasAttr("href"))
+                        .map(e -> e.attr("href"))
+                        .map(s -> s.substring(0, s.indexOf("&ie=")))
+                        .orElse(null));
     }
 
     public AmazonPriceCrawler(final Set<String> searchFilters) {
@@ -116,16 +117,23 @@ public class AmazonPriceCrawler extends PriceCrawler {
 
     @Override
     public Set<Product> getProducts() {
-        String url = getAmazonSearchUrl();
+        Optional<String> url = Optional.ofNullable(getAmazonSearchUrl());
         Elements elements = new Elements();
 
         // Loop through all the pages of search results by iterating through next page link in the search results
-        while (url != null && elements.size() <= MAX_PRODUCTS) {
+        while (url.isPresent() && elements.size() <= MAX_PRODUCTS) {
             // Get the items as elements and append to the master list
-            elements.addAll(getHtmlDocument(url).getElementsByClass("s-result-item"));
+            final Elements items = getHtmlDocument(url.get()).map(d -> d.getElementsByClass("s-result-item")).orElse(null);
 
-            // Get the next page Url
-            url = getNextPageUrl();
+            if (items == null) {
+                url = Optional.empty();
+            }
+            else {
+                elements.addAll(items);
+
+                // Get the next page Url
+                url = getNextPageUrl();
+            }
         }
 
         // Go through the items and filter out bad ones and map to a Product bean set
