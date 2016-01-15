@@ -59,7 +59,7 @@ public class AmazonPriceCrawler extends PriceCrawler {
         // Set the product link
         String itemLink = (itemDetails.hasAttr("href") ? itemDetails.attr("href") : null);
         if (itemLink != null && itemLink.startsWith("http")) {
-            product.setLink(itemLink.substring(0, itemLink.indexOf("/ref=")));
+            product.setLink(itemLink.contains("/ref=") ? itemLink.substring(0, itemLink.indexOf("/ref=")) : itemLink);
         }
 
         // Set the product price
@@ -94,7 +94,7 @@ public class AmazonPriceCrawler extends PriceCrawler {
                 .map(d -> d.getElementById("pagnNextLink"))
                 .filter(e -> e.hasAttr("href"))
                 .map(e -> e.attr("href"))
-                .map(s -> s.substring(0, s.indexOf("&ie=")))
+                .map(s -> s.contains("&ie=") ? s.substring(0, s.indexOf("&ie=")) : s)
                 .orElse(null);
     }
 

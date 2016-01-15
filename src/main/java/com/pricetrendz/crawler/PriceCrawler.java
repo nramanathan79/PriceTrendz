@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 abstract public class PriceCrawler {
-    protected static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
+    protected static final String DEFAULT_USER_AGENT = "Chrome/47.0.2526.106 Safari/537.36";
     protected static final int DEFAULT_TIMEOUT = 5000;
 
     private final String userAgent;
@@ -45,7 +45,7 @@ abstract public class PriceCrawler {
 
     protected Optional<Document> getHtmlDocument(final String url) {
         try {
-            htmlDocument = Optional.ofNullable(Jsoup.connect(fullyQualifiedUrl(url)).userAgent(userAgent).timeout(timeout).followRedirects(true).get());
+            htmlDocument = Optional.ofNullable(Jsoup.connect(fullyQualifiedUrl(url)).userAgent(getUserAgent()).timeout(getTimeout()).followRedirects(true).get());
         }
         catch (IOException ioe) {
             ioe.printStackTrace();
