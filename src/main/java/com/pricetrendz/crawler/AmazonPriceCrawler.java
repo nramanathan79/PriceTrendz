@@ -4,7 +4,6 @@ import com.pricetrendz.bean.Product;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Arrays.stream;
@@ -89,15 +88,14 @@ public class AmazonPriceCrawler extends PriceCrawler {
                 (searchFilters != null ? searchFilters.stream().collect(joining("+")) : "");
     }
 
-    private Optional<String> getNextPageUrl() {
+    private String getNextPageUrl() {
         // Get the URL from the next page link, if exists
-        return Optional.ofNullable(
-                getHtmlDocument()
-                        .map(d -> d.getElementById("pagnNextLink"))
-                        .filter(e -> e.hasAttr("href"))
-                        .map(e -> e.attr("href"))
-                        .map(s -> s.substring(0, s.indexOf("&ie=")))
-                        .orElse(null));
+        return getHtmlDocument()
+                .map(d -> d.getElementById("pagnNextLink"))
+                .filter(e -> e.hasAttr("href"))
+                .map(e -> e.attr("href"))
+                .map(s -> s.substring(0, s.indexOf("&ie=")))
+                .orElse(null);
     }
 
     public AmazonPriceCrawler(final Set<String> searchFilters) {
@@ -117,16 +115,16 @@ public class AmazonPriceCrawler extends PriceCrawler {
 
     @Override
     public Set<Product> getProducts() {
-        Optional<String> url = Optional.ofNullable(getAmazonSearchUrl());
+        String url = getAmazonSearchUrl();
         Elements elements = new Elements();
 
         // Loop through all the pages of search results by iterating through next page link in the search results
-        while (url.isPresent() && elements.size() <= MAX_PRODUCTS) {
+        while (url != null && elements.size() <= MAX_PRODUCTS) {
             // Get the items as elements and append to the master list
-            final Elements items = getHtmlDocument(url.get()).map(d -> d.getElementsByClass("s-result-item")).orElse(null);
+            final Elements items = getHtmlDocument(url).map(d -> d.getElementsByClass("s-result-item")).orElse(null);
 
-            if (items == null) {
-                url = Optional.empty();
+            if (items == null || items.isEmpty()) {
+                url = null;
             }
             else {
                 elements.addAll(items);
