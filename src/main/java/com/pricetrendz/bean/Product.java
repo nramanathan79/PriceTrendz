@@ -89,11 +89,19 @@ public class Product extends BaseBean {
 
     @Override
     public String toString() {
-        return id + "~" + category + "~" + make + "~" + description + "~" + price + "~" + rating + "~" + numberOfRatings + "~[" + filters.stream().collect(joining(", ")) + "]~" + link;
+        return getId() + "~" +
+                getCategory() + "~" +
+                getMake() + "~" +
+                getDescription() + "~" +
+                getPrice() + "~" +
+                getRating() + "~" +
+                getNumberOfRatings() + "~[" +
+                getFilters().stream().collect(joining(",")) + "]~" +
+                getLink();
     }
 
     @Override
     public String getUniqueKey() {
-        return id;
+        return getId();
     }
 }
