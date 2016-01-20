@@ -11,6 +11,6 @@ public class PriceConsumer {
     public static void main(final String[] args) {
         PriceCrawler crawler = new AmazonPriceCrawler(new HashSet<>(asList("Television", "4K")), "Electronics");
 
-        crawler.getProducts().forEach(System.out::println);
+        crawler.getProducts().forEach((item) -> System.out.println(item.toJSON()));
     }
 }
